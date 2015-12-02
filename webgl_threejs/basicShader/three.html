@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BasicShader</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    </head>
+    <body>
+
+<script type="text/javascript" src="three.js"></script>
+<script>
+window.onload = function(){
+
+    canvasWidth  = 512;
+    canvasHeight = 512;
+
+    var vertexSource = document.getElementById('vs').textContent;
+    var fragmentSource = document.getElementById('fs').textContent;
+
+    var renderer = new THREE.WebGLRenderer({antialias : true});
+    renderer.setSize(canvasWidth, canvasHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+    var camera = new THREE.OrthographicCamera( canvasWidth/-2, canvasWidth/2, canvasHeight/2, canvasHeight/-2, 1, 1000 );
+    camera.position.z = 1;
+
+    var scene = new THREE.Scene();
+
+    var geometry = new THREE.PlaneGeometry( canvasWidth, canvasHeight );
+
+    var uniforms = {}
+
+    var shaderMaterial = new THREE.ShaderMaterial({
+        uniforms       : uniforms,
+        vertexShader   : vertexSource,
+        fragmentShader : fragmentSource
+    });
+
+    var mesh = new THREE.Mesh( geometry, shaderMaterial );
+
+    scene.add(mesh);
+
+    renderer.render(scene, camera);
+};
+
+
+</script>
+
+<script id="vs" type="x-shader/x-vertex">
+void main(){
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+</script>
+
+<script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+void main(){
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BasicShader</title>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+
+<script>
+window.onload = function(){
+	// HTML上のCanvasへの参照を取得する
+	var c = document.getElementById('canvas');
+
+	// Canvasサイズを変更
+	c.width = 512;
+	c.height = 512;
+
+	// CanvasエレメントからWebGLコンテキストを取得する
+	var gl = c.getContext('webgl');
+
+	// WebGLコンテキストが取得できたかどうか調べる
+	if(!gl){
+		alert('webgl not supported!');
+		return;
+	}
+
+	// Canvasエレメントをクリアする色を指定する
+	gl.clearColor(1.0, 1.0, 1.0, 1.0);
+
+	// Canvasエレメントをクリアする
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	// 頂点のデータを受け取る
+	var verticesData = genVertices();
+
+	// 頂点データからバッファを生成
+	var vertexBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesData.p), gl.STATIC_DRAW);
+
+	// シェーダとプログラムオブジェクト
+	var vertexSource = document.getElementById('vs').textContent;
+	var fragmentSource = document.getElementById('fs').textContent;
+	var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	var programs = gl.createProgram();
+	gl.shaderSource(vertexShader, vertexSource);
+	gl.compileShader(vertexShader);
+	gl.attachShader(programs, vertexShader);
+	gl.shaderSource(fragmentShader, fragmentSource);
+	gl.compileShader(fragmentShader);
+	gl.attachShader(programs, fragmentShader);
+	gl.linkProgram(programs);
+	gl.useProgram(programs);
+
+	// プログラムオブジェクトに頂点データを登録
+	var attLocation = gl.getAttribLocation(programs, 'position');
+	gl.enableVertexAttribArray(attLocation);
+	gl.vertexAttribPointer(attLocation, 2, gl.FLOAT, false, 0, 0);
+
+	// 描画
+	gl.drawArrays(gl.TRIANGLES, 0, verticesData.p.length / 2);
+	gl.flush();
+};
+
+function genVertices(){
+	var obj = {};
+	obj.p = [
+		-1.0, -1.0,
+         1.0, -1.0,
+        -1.0,  1.0,
+        -1.0,  1.0,
+         1.0, -1.0,
+         1.0,  1.0
+	];
+	return obj;
+}
+
+
+</script>
+
+<script id="vs" type="x-shader/x-vertex">
+attribute vec2 position;
+void main(){
+	gl_Position = vec4(position, 0, 1);
+}
+</script>
+
+<script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+void main(){
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+</script>
+
+	</body>
+</html>
